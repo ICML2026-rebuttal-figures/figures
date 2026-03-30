@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ICML 2026 Rebuttal Figures</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f5f2ec;
+      --surface: #fffef9;
+      --border: #d9d3c7;
+      --text: #1a1812;
+      --muted: #7a7060;
+      --accent: #2d5a3d;
+      --accent-light: #e8f0ea;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+    }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 2.5rem 3rem;
+    }
+    header .label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+    header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+    }
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    .status {
+      text-align: center;
+      padding: 3rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .figure-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .card-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .badge {
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--accent-light);
+      color: var(--accent);
+      font-family: 'DM Mono', monospace;
+    }
+    .card-body { padding: 1.5rem; }
+
+    /* PNG / JPG */
+    .img-viewer img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 4px;
+    }
+
+    /* SVG — rendered via <img> from raw URL, fully sharp */
+    .svg-viewer img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 4px;
+      background: white;
+    }
+
+    /* PDF — rendered via PDF.js onto a canvas */
+    .pdf-viewer {
+      position: relative;
+    }
+    .pdf-canvas-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .pdf-canvas-wrap canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+    .open-link {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.45rem 1rem;
+      background: var(--accent-light);
+      color: var(--accent);
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-family: 'DM Mono', monospace;
+    }
+    .open-link:hover { background: var(--accent); color: white; }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="label">ICML 2026 · Rebuttal Materials</div>
+  <h1>Figures &amp; Supplementary</h1>
+</header>
+
+<main id="main">
+  <div class="status" id="status">Loading files…</div>
+</main>
+
+<footer>ICML 2026 Rebuttal · Hosted via GitHub Pages</footer>
+
+<!-- PDF.js from cdnjs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  const GITHUB_USER = 'icml2026-rebuttal-figures';
+  const GITHUB_REPO = 'figure';
+  const BRANCH = 'main';
+  const SUPPORTED = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'pdf'];
+
+  function rawUrl(path) {
+    return `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${BRANCH}/${path}`;
+  }
+
+  async function renderPDF(url, container) {
+    try {
+      const pdf = await pdfjsLib.getDocument({ url, withCredentials: false }).promise;
+      const wrap = document.createElement('div');
+      wrap.className = 'pdf-canvas-wrap';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 2.5 });
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+        wrap.appendChild(canvas);
+      }
+      container.appendChild(wrap);
+    } catch (e) {
+      container.innerHTML = `<p style="color:var(--muted);font-size:0.85rem">Failed to render PDF: ${e.message}</p>`;
+    }
+  }
+
+  async function loadFiles() {
+    const main = document.getElementById('main');
+    const status = document.getElementById('status');
+
+    try {
+      const res = await fetch(
+        `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/git/trees/${BRANCH}?recursive=1`
+      );
+      if (!res.ok) throw new Error(`GitHub API ${res.status}`);
+      const data = await res.json();
+
+      const files = data.tree
+        .filter(f => f.type === 'blob')
+        .filter(f => SUPPORTED.includes(f.path.split('.').pop().toLowerCase()))
+        .filter(f => f.path !== 'index.html')
+        .sort((a, b) => a.path.localeCompare(b.path));
+
+      status.remove();
+      if (!files.length) {
+        main.innerHTML = '<div class="status">No supported files found.</div>';
+        return;
+      }
+
+      for (const file of files) {
+        const ext = file.path.split('.').pop().toLowerCase();
+        const raw = rawUrl(file.path);
+
+        const card = document.createElement('div');
+        card.className = 'figure-card';
+        card.innerHTML = `
+          <div class="card-header">
+            <span class="card-title">${file.path}</span>
+            <span class="badge">${ext.toUpperCase()}</span>
+          </div>
+          <div class="card-body" id="body-${file.path.replace(/\W/g,'_')}"></div>
+        `;
+        main.appendChild(card);
+
+        const body = card.querySelector('.card-body');
+
+        if (['png','jpg','jpeg','gif','webp'].includes(ext)) {
+          body.className += ' img-viewer';
+          body.innerHTML = `<img src="${raw}" alt="${file.path}">`;
+        } else if (ext === 'svg') {
+          body.className += ' svg-viewer';
+          // SVG via <img> tag with raw URL — sharp, no CORS issue
+          body.innerHTML = `<img src="${raw}" alt="${file.path}">
+            <a class="open-link" href="${raw}" target="_blank">Open SVG ↗</a>`;
+        } else if (ext === 'pdf') {
+          body.className += ' pdf-viewer';
+          // PDF.js renders PDF to canvas — no CORS issue, fully sharp
+          await renderPDF(raw, body);
+          body.insertAdjacentHTML('beforeend',
+            `<a class="open-link" href="${raw}" target="_blank">Open PDF ↗</a>`);
+        }
+      }
+    } catch (err) {
+      status.textContent = `Error: ${err.message}`;
+    }
+  }
+
+  loadFiles();
+</script>
+</body>
+</html>
